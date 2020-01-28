@@ -1,7 +1,7 @@
 # load HL detection model from imageAI
 # open camera with openCV, analyze frame by frame
 # draw a red frame around the detected object
-# display FPS
+# display FPS, resize image to 1/4 to improve performance
 
 from imageai.Detection.Custom import CustomObjectDetection
 import os
@@ -37,14 +37,20 @@ while True:
         y1 *= 4
         x2 *= 4
         y2 *= 4
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
-        (x1, y1, x2, y2) = detection["box_points"]
-        detectionInfo = detection["name"] + " : " + str(detection["percentage_probability"]) + "x1: " + str(x1) + " - y1: " + str(y1) + " - x2: "+ str(x2) + " - y2: " + str(y2)
-        print(detectionInfo)
+        # Draw a label with the detected object type below the frame
+        font = cv2.FONT_HERSHEY_DUPLEX
+        cv2.putText(frame, detection["name"], (x1 + 6, y1 - 6), font, 1.0, (255, 255, 255), 1)
 
     #display FPS
     fpsInfo = "FPS: " + str(1.0 / (time.time() - start_time)) # FPS = 1 / time to process loop
     print(fpsInfo)
+    font = cv2.FONT_HERSHEY_DUPLEX
+    cv2.putText(frame, fpsInfo, (10, 20), font, 0.4, (255, 255, 255), 1)
+
+    # Display the resulting image
+    cv2.imshow('Video', frame)
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
